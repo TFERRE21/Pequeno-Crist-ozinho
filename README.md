@@ -1,29 +1,30 @@
-# Pequeno Cristãozinho — Loja de Artigos Cristãos Infantis
+# Pequeno Cristãozinho — loja de materiais cristãos infantis
 
-Este repositório foi inicializado para a loja de materiais cristãos infantis descrita no documento de requisitos.
+Aplicação Next.js em português brasileiro para catálogo de materiais digitais para famílias, professores de EBD e ministérios infantis.
 
-## Escopo planejado
-- Catálogo responsivo em português brasileiro para molduras, painéis, devocionais, atividades bíblicas, materiais para professores e kits.
-- Fábrica administrativa para gerar conteúdo e arquivos digitais originais (PDF/PNG/JPG/ZIP), mantendo produtos em rascunho até revisão.
-- Checkout Stripe em BRL, confirmação de pagamento por webhook e entrega digital protegida.
-- Persistência de pedidos, tarefas de geração e arquivos em armazenamento privado.
-- SEO, páginas institucionais e testes automatizados.
+## Executar localmente
+1. Use Node.js 20 ou superior.
+2. Copie `.env.example` para `.env.local` e configure as variáveis.
+3. Execute `npm install`, `npm test`, `npm run build` e `npm run dev`.
+4. Acesse `http://localhost:3000`.
 
-## Estado atual
-O repositório estava vazio e não continha branch/commit anterior. Este README é o primeiro commit de inicialização; não representa uma loja operacional nem uma integração de pagamento validada.
+## Implementado nesta etapa
+- Loja responsiva com busca, categorias e sacola.
+- Catálogo inicial com preços inteiros em centavos de real.
+- Endpoint de Stripe Checkout em BRL que valida IDs, quantidades e preços no servidor.
+- Endpoint webhook que valida assinatura Stripe usando o corpo bruto da requisição.
+- Endpoint administrativo protegido por `ADMIN_API_TOKEN` como ponto inicial da fábrica.
+- Testes automatizados básicos para catálogo e verificações de segurança.
 
-## Próximas etapas
-A implementação exige criar a aplicação, banco/migrações e testes, então configurar no ambiente de implantação as variáveis privadas necessárias. Nunca coloque chaves secretas no Git.
+## Pendências importantes — não está pronto para vendas em produção
+O catálogo atual contém 9 conceitos exibidos como aprovados e 3 rascunhos; ainda não são arquivos digitais finais. Não existem 50 produtos com PDFs/PNG/JPG/ZIP validados. A fábrica ainda não gera arquivos, o endpoint webhook ainda não persiste pedidos nem libera downloads, e ainda faltam banco de dados, idempotência persistente, autenticação de administrador completa, armazenamento privado, links temporários, histórico de compras, fluxo de reembolso e páginas institucionais completas. Não anunciar vendas operacionais até implementar e testar esses itens.
 
-Variáveis esperadas para uma implementação Stripe:
-- `STRIPE_SECRET_KEY`
-- `STRIPE_PUBLISHABLE_KEY` (se necessária ao frontend)
-- `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_CURRENCY=brl`
-- `STRIPE_SUCCESS_URL`
-- `STRIPE_CANCEL_URL`
+## Variáveis de ambiente
+- `STRIPE_SECRET_KEY`: chave Stripe secreta; use test key durante validação.
+- `STRIPE_WEBHOOK_SECRET`: segredo de assinatura do webhook.
+- `STRIPE_CURRENCY=brl`.
+- `NEXT_PUBLIC_SITE_URL`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`.
+- `OPENAI_API_KEY`: para a futura geração de conteúdo.
+- `ADMIN_API_TOKEN`: token aleatório forte para proteger a fábrica.
 
-Para geração via OpenAI: `OPENAI_API_KEY`. Para persistência, definir também credenciais do banco e do armazenamento privado que forem escolhidos.
-
-## Diretriz de segurança
-A confirmação de pagamento deve ocorrer por webhook verificado no servidor. A página de sucesso do navegador nunca deve, sozinha, liberar arquivos. Os arquivos vendidos devem ser privados e acessíveis somente a compradores autorizados após pagamento confirmado.
+Nunca publique chaves reais no GitHub. Nenhuma cobrança real foi realizada. A página de sucesso, sozinha, nunca deve liberar downloads.
