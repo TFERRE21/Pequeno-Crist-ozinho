@@ -8,6 +8,10 @@ Aplicação Next.js em português brasileiro para catálogo de materiais digitai
 3. Execute `npm install`, `npm test`, `npm run build` e `npm run dev`.
 4. Acesse `http://localhost:3000`.
 
+## Geração dos 12 cadernos de atividades
+
+Foi adicionado `scripts/generate-materials.cjs`, que gera 12 PDFs A4 iniciais para os produtos de atividades bíblicas definidos no projeto. Para gerar no ambiente de execução, use `npm run materials:generate`. Os arquivos são gravados em `storage/private-materials/`, fora de `public/` e ignorados pelo Git. A geração é um primeiro rascunho editorial: requer revisão visual, conferência pedagógica e testes de impressão antes de associar os arquivos a produtos vendidos. O comando ainda precisa ser executado no VPS e os PDFs precisam ser inspecionados.
+
 ## Implementado nesta etapa
 - Loja responsiva com busca, categorias e sacola.
 - Catálogo inicial de 50 produtos sincronizados com IDs reais de produtos e preços Stripe em BRL; os itens permanecem em rascunho até os arquivos finais serem gerados e revisados.
