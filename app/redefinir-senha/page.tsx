@@ -1,0 +1,9 @@
+"use client";
+import {FormEvent,useState} from "react";
+import {useSearchParams} from "next/navigation";
+import Link from "next/link";
+import {Suspense} from "react";
+function ResetForm(){const params=useSearchParams();const token=params.get("token")||"";const [password,setPassword]=useState(""),[confirm,setConfirm]=useState(""),[message,setMessage]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);
+async function submit(e:FormEvent){e.preventDefault();setError("");setMessage("");if(password!==confirm){setError("As senhas não conferem.");return;}setBusy(true);try{const r=await fetch("/api/auth/reset-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token,password})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Não foi possível alterar a senha.");setMessage(d.message);}catch(e){setError(e instanceof Error?e.message:"Falha ao redefinir senha.");}finally{setBusy(false);}}
+return <main className="auth-shell"><section className="auth-card"><Link href="/" className="auth-brand">🌱 Pequeno Cristãozinho</Link><h1>Crie uma nova senha</h1><p>Use pelo menos 10 caracteres.</p><form onSubmit={submit}><label htmlFor="password">Nova senha</label><input id="password" type="password" minLength={10} maxLength={128} required value={password} onChange={e=>setPassword(e.target.value)}/><label htmlFor="confirm">Confirme a senha</label><input id="confirm" type="password" minLength={10} maxLength={128} required value={confirm} onChange={e=>setConfirm(e.target.value)}/>{error&&<p className="notice">{error}</p>}{message&&<p className="success-note">{message} <Link href="/entrar">Entrar</Link></p>}<button className="primary full" disabled={busy||!token}>{busy?"Salvando…":"Alterar senha"}</button></form></section></main>}
+export default function RedefinirSenhaPage(){return <Suspense fallback={<main className="auth-shell">Carregando…</main>}><ResetForm/></Suspense>}
