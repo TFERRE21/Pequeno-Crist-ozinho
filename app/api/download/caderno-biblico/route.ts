@@ -34,6 +34,6 @@ export async function GET(request:Request) {
   zip.file("Caderno_Atividades_Biblicas_A4.pdf",await makePdf(svgs));
   zip.file("LEIA-ME.txt","Pequeno Cristãozinho — Caderno de Atividades Bíblicas Infantis. Inclui 12 páginas SVG individuais e PDF completo em A4. Imprima em A4, retrato, cores ativadas.\n");
   const buffer=await zip.generateAsync({type:"nodebuffer",compression:"DEFLATE",compressionOptions:{level:6}});
-  return new Response(buffer,{status:200,headers:{"Content-Type":"application/zip","Content-Disposition":"attachment; filename=\"Caderno_Atividades_Biblicas_A4.zip\"","Cache-Control":"private, no-store","Content-Length":String(buffer.length)}});
+  return new Response(new Uint8Array(buffer),{status:200,headers:{"Content-Type":"application/zip","Content-Disposition":"attachment; filename=\"Caderno_Atividades_Biblicas_A4.zip\"","Cache-Control":"private, no-store","Content-Length":String(buffer.length)}});
  }catch(error){console.error("Falha ao montar arquivo",error instanceof Error?error.message:"erro desconhecido");return NextResponse.json({error:"Não foi possível montar o pacote de impressão."},{status:500});}
 }
