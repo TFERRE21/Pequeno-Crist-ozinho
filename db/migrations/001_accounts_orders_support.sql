@@ -160,3 +160,35 @@ CREATE TABLE IF NOT EXISTS pc_audit_log (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS pc_audit_entity_date_idx ON pc_audit_log(entity_type,entity_id,created_at DESC);
+
+CREATE TABLE IF NOT EXISTS pc_auth_attempts (
+  id bigserial PRIMARY KEY,
+  email_key text NOT NULL,
+  ip_key text NOT NULL,
+  attempted_at timestamptz NOT NULL DEFAULT now(),
+  succeeded boolean NOT NULL DEFAULT false
+);
+CREATE INDEX IF NOT EXISTS pc_auth_attempts_email_time_idx ON pc_auth_attempts(email_key,attempted_at DESC);
+CREATE INDEX IF NOT EXISTS pc_auth_attempts_ip_time_idx ON pc_auth_attempts(ip_key,attempted_at DESC);
+
+CREATE TABLE IF NOT EXISTS pc_email_outbox (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  recipient text NOT NULL,
+  template_key text NOT NULL,
+  payload jsonb NOT NULL DEFAULT '{}'::jsonb,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','sent','failed')),
+  attempts integer NOT NULL DEFAULT 0,
+  last_error text,
+  sent_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS pc_email_outbox_pending_idx ON pc_email_outbox(status,created_at) WHERE status<>'sent';
+
+INSERT INTO pc_knowledge_articles(slug,title,category,content,published) VALUES
+('como-comprar','Como comprar','compras','Escolha um material, adicione à sacola e finalize o checkout seguro do Stripe. O pagamento é confirmado pelo sistema por webhook. Guarde o e-mail usado no checkout para localizar o pedido.','true'),
+('pagamento','Pagamento e confirmação','pagamento','A confirmação depende do retorno oficial do Stripe. A página de sucesso, isoladamente, não confirma pagamento. Se o pedido não aparecer, abra um chamado com o número do pedido e o e-mail usado na compra.','true'),
+('materiais','Acesso aos materiais','downloads','Materiais digitais só podem ser baixados quando o pagamento estiver confirmado e o arquivo final estiver publicado e liberado. Se a compra foi aprovada mas o download não aparece, abra um chamado.','true'),
+('impressao','Como imprimir','impressao','Quando o arquivo estiver disponível, confira o formato indicado no produto. Para páginas A4, selecione papel A4, orientação retrato ou paisagem conforme a página, e confira a prévia antes de imprimir.','true'),
+('suporte','Como falar com o suporte','suporte','Entre em Minha Conta e abra um chamado com assunto, categoria e descrição do problema. Guarde o protocolo para acompanhar o atendimento.','true')
+ON CONFLICT(slug) DO NOTHING;
