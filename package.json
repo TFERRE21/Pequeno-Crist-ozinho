@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test"
+    "test": "node --test",
+    "materials:generate": "node scripts/generate-materials.cjs"
   },
   "dependencies": {
     "next": "^15.2.4",
