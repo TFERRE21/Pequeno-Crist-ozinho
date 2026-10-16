@@ -22,8 +22,8 @@ export async function POST(request: Request) {
    line_items.push({quantity:q,price:p.stripePriceId});
    selected.push({id:p.id,name:p.name,price:p.price,quantity:q,stripePriceId:p.stripePriceId});
   }
-  const email=user?.email||(typeof body.email==="string"?body.email.trim().toLowerCase():"");
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return NextResponse.json({error:"Informe um e-mail válido para receber a confirmação da compra."},{status:400});
+  const suppliedEmail=typeof body.email==="string"?body.email.trim().toLowerCase():"";
+  const email=user?.email||(suppliedEmail&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(suppliedEmail)?suppliedEmail:"");
   const total=selected.reduce((sum,p)=>sum+p.price*p.quantity,0);
   const orderNumber="PC-"+new Date().toISOString().slice(0,10).replace(/-/g,"")+"-"+randomBytes(3).toString("hex").toUpperCase();
   const order=await transaction(async client=>{
