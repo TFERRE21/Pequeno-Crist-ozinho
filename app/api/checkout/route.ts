@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const total=selected.reduce((sum,p)=>sum+p.price*p.quantity,0);
   const orderNumber="PC-"+new Date().toISOString().slice(0,10).replace(/-/g,"")+"-"+randomBytes(3).toString("hex").toUpperCase();
   const order=await transaction(async client=>{
-   const created=await client.query("INSERT INTO pc_orders(order_number,user_id,customer_email,total_cents,currency,status,payment_status) VALUES($1,$2,$3,$4,'brl','pending','pending') RETURNING id",[orderNumber,user?.id||null,email,total]);
+   const created=await client.query("INSERT INTO pc_orders(order_number,user_id,customer_email,total_cents,currency,status,payment_status) VALUES($1,$2,$3,$4,'brl','pending','pending') RETURNING id",[orderNumber,user?.id||null,email||("pending+"+orderNumber+"@checkout.invalid"),total]);
    const id=created.rows[0].id as string;
    for(const p of selected)await client.query("INSERT INTO pc_order_items(order_id,product_id,product_name,unit_price_cents,quantity,subtotal_cents,stripe_price_id) VALUES($1,$2,$3,$4,$5,$6,$7)",[id,p.id,p.name,p.price,p.quantity,p.price*p.quantity,p.stripePriceId]);
    return id;
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
    mode:"payment",line_items,
    success_url:base+"/sucesso?session_id={CHECKOUT_SESSION_ID}",
    cancel_url:base+"/#carrinho",
-   customer_email:email,
+   ...(email?{customer_email:email}:{customer_creation:"always"}),
    client_reference_id:user?.id,
    metadata:{store:"pequeno-cristaozinho",order_id:order,order_number:orderNumber,product_ids:[...new Set(selected.map(p=>p.id))].join(",")},
    payment_intent_data:{metadata:{store:"pequeno-cristaozinho",order_id:order,order_number:orderNumber}}
