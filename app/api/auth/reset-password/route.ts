@@ -12,7 +12,7 @@ export async function POST(request:Request){
    const r=await client.query("SELECT id,user_id FROM pc_email_tokens WHERE token_hash=$1 AND purpose='password_reset' AND used_at IS NULL AND expires_at>now() FOR UPDATE",[hash]);const row=r.rows[0];if(!row)return false;
    await client.query("UPDATE pc_email_tokens SET used_at=now() WHERE id=$1",[row.id]);
    await client.query("UPDATE pc_users SET password_hash=$2,updated_at=now() WHERE id=$1",[row.user_id,passwordHash]);
-   await client.query("INSERT INTO pc_audit_log(actor_user_id,action,entity_type,entity_id) VALUES($1,'password_reset','user',$1)",[row.user_id]);
+   await client.query("INSERT INTO pc_audit_log(actor_user_id,action,entity_type,entity_id) VALUES($1,'password_reset','user',$2)",[row.user_id,row.user_id]);
    return true;
   });
   if(!done)return NextResponse.json({error:"Link expirado ou já utilizado. Solicite uma nova recuperação."},{status:400});
