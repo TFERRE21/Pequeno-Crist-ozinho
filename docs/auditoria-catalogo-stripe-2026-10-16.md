@@ -4,21 +4,20 @@
 
 ## Resumo
 
-- Produtos cadastrados no catálogo local: **51**.
+- Produtos cadastrados no catálogo local: **50**.
 - Produtos Stripe identificados com marca Pequeno Cristãozinho: **50**.
 - Produtos e preços Stripe listados nesta consulta: 64 produtos e 70 preços (a lista completa de produtos e preços do Stripe não significa que todos pertençam a esta loja).
-- Produtos locais sem produto Stripe: **1**.
-- Produtos locais sem preço Stripe: **1**.
-- Divergências entre valor local e valor do preço Stripe: **1**.
-- Preços que não são BRL: **1**.
-- Produtos Stripe inativos entre os registros locais: **51**.
+- Produtos locais sem produto Stripe: **0**.
+- Produtos locais sem preço Stripe: **0**.
+- Divergências entre valor local e valor do preço Stripe: **0**.
+- Preços que não são BRL: **0**.
+- Produtos Stripe inativos entre os registros locais: **50**.
 - Produtos Stripe da marca ausentes no catálogo local: **0**.
 
 ## Inventário dos produtos locais
 
 | Nº | Slug | Produto no Stripe | Product ID | Price ID | Preço Stripe | Status Stripe | Conferência |
 |---:|---|---|---|---|---:|---|---|
-| 1 | — | — | — | — | NÃO ENCONTRADO | não encontrado | PRODUTO AUSENTE |
 | 2 | moldura-jesus-ama | Pequeno Cristãozinho — Moldura Jesus Ama as Crianças | prod_VS73dgfm3Tf7v9 | price_1URCouCCSBhBJictTrI7W7Iq | BRL 4.90 | inativo | IDs/valor/moeda conferem |
 | 3 | moldura-deus-cuida | Pequeno Cristãozinho — Quadro Deus Cuida de Mim | prod_VS73PCc4AkqmH6 | price_1URCp1CCSBhBJict7K2LzRa6 | BRL 4.90 | inativo | IDs/valor/moeda conferem |
 | 4 | frutos-espirito | Pequeno Cristãozinho — Frutos do Espírito | prod_VS73Cb5a415hNJ | price_1URCp4CCSBhBJictrGY4Gq2g | BRL 7.90 | inativo | IDs/valor/moeda conferem |
@@ -84,4 +83,4 @@ Nenhum.
 
 ## Dados completos
 
-Os dados estruturados de cada registro devem ser exportados separadamente para JSON/CSV quando a auditoria for fechada; este documento é um relatório inicial baseado no catálogo local e nas respostas atuais do Stripe.
+Conferência feita por identificador: os 50 produtos locais correspondem aos 50 produtos Stripe da marca, e os 50 price IDs encontrados são preços ativos em BRL, pertencem ao produto correto e correspondem ao valor local e ao preço padrão. Os 50 produtos Stripe estão inativos, por isso devem continuar indisponíveis para compra até os materiais serem concluídos.
