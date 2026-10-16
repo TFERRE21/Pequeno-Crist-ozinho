@@ -1,0 +1,7 @@
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
+export const runtime="nodejs";
+export async function POST(request:Request){const secret=process.env.STRIPE_SECRET_KEY;const hook=process.env.STRIPE_WEBHOOK_SECRET;if(!secret||!hook)return NextResponse.json({error:"Webhook não configurado."},{status:503});const signature=request.headers.get("stripe-signature");if(!signature)return NextResponse.json({error:"Assinatura ausente."},{status:400});const stripe=new Stripe(secret);const rawBody=await request.text();let event:Stripe.Event;try{event=stripe.webhooks.constructEvent(rawBody,signature,hook);}catch{return NextResponse.json({error:"Assinatura inválida."},{status:400});}
+// Segurança: ainda não existe persistência de pedidos/arquivos; nenhum download é liberado por este endpoint.
+switch(event.type){case "checkout.session.completed":{const s=event.data.object as Stripe.Checkout.Session;if(s.payment_status==="paid")console.info("Pagamento confirmado; persistência pendente",{eventId:event.id,sessionId:s.id});break;}case "checkout.session.async_payment_succeeded":console.info("Pagamento assíncrono confirmado",{eventId:event.id});break;case "checkout.session.async_payment_failed":console.warn("Pagamento assíncrono falhou",{eventId:event.id});break;case "charge.refunded":console.info("Reembolso recebido",{eventId:event.id});break;}
+return NextResponse.json({received:true,processed:false,reason:"Persistência e entrega digital ainda não implementadas."});}
