@@ -32,7 +32,7 @@ export async function POST(request:Request) {
       await client.query("UPDATE pc_orders SET status=$2,payment_status=$3,updated_at=now() WHERE id=$1 AND payment_status<>'paid'",[id,event.type==="checkout.session.expired"?"cancelled":"failed",event.type==="checkout.session.expired"?"failed":"failed"]);
     } else if(session.payment_status==="paid"){
       const paymentIntent=typeof session.payment_intent==="string"?session.payment_intent:null;
-      await client.query("UPDATE pc_orders SET status='paid',payment_status='paid',stripe_payment_intent_id=COALESCE($2,stripe_payment_intent_id),paid_at=COALESCE(paid_at,now()),updated_at=now() WHERE id=$1",[id,paymentIntent]);
+      await client.query("UPDATE pc_orders SET status='paid',payment_status='paid',customer_email=COALESCE($3,customer_email),stripe_payment_intent_id=COALESCE($2,stripe_payment_intent_id),paid_at=COALESCE(paid_at,now()),updated_at=now() WHERE id=$1",[id,paymentIntent,session.customer_details?.email||session.customer_email||null]);
       const items=await client.query<{id:string;product_id:string;private_file_path:string|null}>("SELECT i.id,i.product_id,p.private_file_path FROM pc_order_items i LEFT JOIN pc_products p ON p.id=i.product_id WHERE i.order_id=$1",[id]);
       for(const item of items.rows){
        await client.query("INSERT INTO pc_deliveries(order_id,order_item_id,product_id,private_file_path,status,released_at) VALUES($1,$2,$3,$4,$5,CASE WHEN $5='available' THEN now() ELSE NULL END) ON CONFLICT(order_item_id) DO NOTHING",[id,item.id,item.product_id,item.private_file_path,item.private_file_path?"available":"pending"]);
