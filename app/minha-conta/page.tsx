@@ -3,7 +3,8 @@ import { FormEvent,useEffect,useState } from "react";
 import Link from "next/link";
 type User={id:string;email:string;fullName:string;role:string};
 type Order={id:string;order_number:string;total_cents:number;currency:string;status:string;payment_status:string;created_at:string;paid_at:string|null;items:{productId:string;name:string;quantity:number;subtotalCents:number}[]};
-type Ticket={id:string;ticket_number:string;subject:string;category:string;status:string;priority:string;created_at:string;unread_count:number};\ntype Material={delivery_id:string;product_id:string;product_name:string;order_number:string;purchase_date:string};
+type Ticket={id:string;ticket_number:string;subject:string;category:string;status:string;priority:string;created_at:string;unread_count:number};
+type Material={delivery_id:string;product_id:string;product_name:string;order_number:string;purchase_date:string};
 export default function MinhaContaPage(){
  const [user,setUser]=useState<User|null>(null),[orders,setOrders]=useState<Order[]>([]),[materials,setMaterials]=useState<Material[]>([]),[tickets,setTickets]=useState<Ticket[]>([]),[subject,setSubject]=useState(""),[message,setMessage]=useState(""),[category,setCategory]=useState("outros"),[notice,setNotice]=useState("Carregando sua conta…"),[busy,setBusy]=useState(false);
  async function load(){const me=await fetch("/api/auth/me",{cache:"no-store"});if(!me.ok){setNotice("Entre na sua conta para consultar seus pedidos e chamados.");return;}const md=await me.json();setUser(md.user);const [o,t,m]=await Promise.all([fetch("/api/account/orders",{cache:"no-store"}),fetch("/api/account/support",{cache:"no-store"}),fetch("/api/account/materials",{cache:"no-store"})]);if(o.ok)setOrders((await o.json()).orders||[]);if(t.ok)setTickets((await t.json()).tickets||[]);if(m.ok)setMaterials((await m.json()).materials||[]);setNotice("");}
