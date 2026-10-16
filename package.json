@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "node --test",
-    "materials:generate": "node scripts/generate-materials.cjs"
+    "materials:generate": "node scripts/generate-materials.cjs",
+    "db:migrate": "node scripts/migrate.cjs"
   },
   "dependencies": {
     "next": "^15.2.4",
