@@ -9,7 +9,7 @@ export async function POST(request:Request) {
   if(!ticketId||message.length<1||message.length>5000)return NextResponse.json({error:"Informe o chamado e a mensagem."},{status:400});
   const ticket=await query<{id:string;ticket_number:string;subject:string;status:string}>("SELECT id,ticket_number,subject,status FROM pc_support_tickets WHERE id=$1 AND user_id=$2",[ticketId,user.id]);
   if(!ticket.rows[0])return NextResponse.json({error:"Chamado não encontrado."},{status:404});
-  const customerMessage=await query("INSERT INTO pc_support_messages(ticket_id,author_user_id,author_type,content) VALUES($1,$2,'customer',$3) RETURNING id",[ticketId,user.id,message]);
+  await query("INSERT INTO pc_support_messages(ticket_id,author_user_id,author_type,content) VALUES($1,$2,'customer',$3) RETURNING id",[ticketId,user.id,message]);
   const [knowledge,history,orders]=await Promise.all([
    query<{title:string;content:string}>("SELECT title,content FROM pc_knowledge_articles WHERE published=true ORDER BY updated_at DESC LIMIT 30"),
    query<{author_type:string;content:string}>("SELECT author_type,content FROM pc_support_messages WHERE ticket_id=$1 ORDER BY created_at DESC LIMIT 12",[ticketId]),
