@@ -13,7 +13,7 @@ export async function POST(request:Request) {
   const attempts=await query<{count:string}>("SELECT count(*)::text AS count FROM pc_auth_attempts WHERE attempted_at>now()-interval '15 minutes' AND succeeded=false AND (email_key=$1 OR ip_key=$2)",[createHash("sha256").update(email).digest("hex"),ipKey]);
   if(Number(attempts.rows[0]?.count||0)>=10)return NextResponse.json({error:"Muitas tentativas. Aguarde 15 minutos antes de tentar novamente."},{status:429});
   const result=await query<{id:string;email:string;full_name:string;password_hash:string;role:"customer"|"admin";status:string}>("SELECT id,email,full_name,password_hash,role,status FROM pc_users WHERE lower(email)=$1 LIMIT 1",[email]);
-  const user=result.rows[0];const passwordOk=user?await bcrypt.compare(password,user.password_hash):await bcrypt.compare(password,"$2a$12$C6UzMDM.H6dfI/f/IKcEe.3K8sW5qWJ7g7N8HqV7f7X0H9q8K7YqK");
+  const user=result.rows[0];const passwordOk=user?await bcrypt.compare(password,user.password_hash):(await bcrypt.hash(password,12),false);
   const succeeded=!!user&&passwordOk&&user.status==="active";
   await query("INSERT INTO pc_auth_attempts(email_key,ip_key,succeeded) VALUES($1,$2,$3)",[createHash("sha256").update(email).digest("hex"),ipKey,succeeded]);
   if(!user||!passwordOk)return NextResponse.json({error:"E-mail ou senha incorretos."},{status:401});
