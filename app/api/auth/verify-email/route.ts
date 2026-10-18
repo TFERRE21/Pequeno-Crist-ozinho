@@ -12,6 +12,8 @@ export async function GET(request:Request) {
       const row = found.rows[0]; if (!row) return false;
       await client.query("UPDATE pc_email_tokens SET used_at=now() WHERE id=$1",[row.id]);
       await client.query("UPDATE pc_users SET status='active',email_verified_at=COALESCE(email_verified_at,now()),updated_at=now() WHERE id=$1",[row.user_id]);
+      // Vincula compras de convidado ao cadastro verificado com o mesmo endereço.
+      await client.query("UPDATE pc_orders SET user_id=$1,updated_at=now() WHERE user_id IS NULL AND lower(customer_email)=(SELECT lower(email) FROM pc_users WHERE id=$1)",[row.user_id]);
       return true;
     });
     const site=(process.env.NEXT_PUBLIC_SITE_URL||new URL(request.url).origin).replace(/\/$/,"");
