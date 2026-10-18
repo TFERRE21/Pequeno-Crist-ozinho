@@ -51,7 +51,7 @@ Foi adicionada uma base inicial de autenticação por senha com hash bcrypt, coo
 1. Faça backup do banco PostgreSQL já utilizado pelo projeto.
 2. Configure as variáveis no VPS.
 3. Instale as dependências: `npm install`.
-4. Execute `npm run db:migrate` uma vez para criar as tabelas aditivas de contas, pedidos, entregas, suporte, tokens e auditoria.
+4. Execute `npm run db:migrate` para aplicar as migrações pendentes, criar as tabelas aditivas e sincronizar os 50 produtos iniciais no catálogo PostgreSQL.
 5. Rode `npm test` e `npm run build` antes de publicar.
 
 A migração é aditiva e não remove tabelas existentes. A execução no banco real ainda precisa ser feita pelo operador do VPS.
@@ -68,7 +68,7 @@ A migração é aditiva e não remove tabelas existentes. A execução no banco 
 
 - O código foi gravado no GitHub, mas ainda precisa de instalação de dependências, execução de migração, testes automatizados e build. Não afirmar que está funcionando no VPS até confirmar essas etapas.
 - A conta administrativa deve ser criada/promovida manualmente por operador autorizado no banco; não há cadastro público de administradores.
-- A confirmação de pagamento é persistida via webhook; arquivos sem caminho privado publicado permanecem como entrega pendente. Os materiais precisam ser produzidos, inspecionados e vinculados antes de venda.
+- A confirmação de pagamento é persistida via webhook; arquivos sem caminho privado publicado permanecem como entrega pendente. A confirmação por e-mail usa `RESEND_API_KEY` e `DELIVERY_FROM_EMAIL`. Pedidos feitos como convidado podem ser vinculados a uma conta após o cliente criar a conta com o mesmo e-mail e confirmar o endereço. Os materiais precisam ser produzidos, inspecionados e vinculados antes de venda.
 - A política de reembolso, dados legais da loja e canal de contato devem ser completados e revisados pelo responsável.
 - A entrega por e-mail ainda precisa de uma rotina de reenvio/outbox operacional para garantir novas tentativas quando o provedor falhar.
 - A IA de suporte usa a base oficial publicada e os pedidos do usuário autenticado; a integração deve ser testada com a chave e o modelo configurados.
