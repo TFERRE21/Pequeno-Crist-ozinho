@@ -66,11 +66,11 @@ async function processPaidSession(session: Stripe.Checkout.Session, event: Strip
       if (inserted.rows[0]?.status === "available" && inserted.rows[0]?.private_file_path) hasDownloads = true;
     }
     await client.query("UPDATE pc_stripe_events SET processed_at=now(),result='payment_confirmed' WHERE event_id=$1",[event.id]);
-    return {duplicate:false,orderNumber:order.order_number,total:Number(order.total_cents),email:email||order.customer_email,hasDownloads};
+    return {duplicate:false,wasAlreadyPaid:order.payment_status==="paid",orderNumber:order.order_number,total:Number(order.total_cents),email:email||order.customer_email,hasDownloads};
   });
   if ("duplicate" in result && result.duplicate) return {processed:true,duplicate:true};
   let emailSent = false;
-  if (result.email && !result.email.endsWith("@checkout.invalid")) {
+  if (!result.wasAlreadyPaid && result.email && !result.email.endsWith("@checkout.invalid")) {
     try { emailSent = await sendPaymentEmail({email:result.email,orderNumber:result.orderNumber,total:result.total,site,hasDownloads:result.hasDownloads}); }
     catch (error) { console.error("Erro no e-mail de confirmação:",error instanceof Error?error.message:"desconhecido"); }
   }
